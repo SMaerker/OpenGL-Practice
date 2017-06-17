@@ -6,9 +6,55 @@
 #include <glut\freeglut.h>
 #include <gl\GL.h>
 
+//extern const char* const vertShader;
+//extern const char* const fragShader;
+
+const char* const vertShader =
+"#version 430\r\n"
+"in layout(location = 0) vec2 position;"
+"void main()"
+"{"
+"gl_Position = vec4(position, 0.0, 1.0);"
+"}";
+
+const char* const fragShader =
+"#version 430\r\n"
+"out vec4 nicecolor;"
+"void main()"
+"{"
+"nicecolor = vec4(1.0, 0.5, 0.0, 1.0);"
+"}";
+
+void setupShaders(){
+	GLuint vertShaderID = glCreateShader(GL_VERTEX_SHADER);
+	GLuint fragShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+
+	int programID;
+
+	const char *adapter[1];
+	adapter[0] = vertShader;
 
 
+	
+	const GLchar *const *foo = &vertShader;
+	const GLchar *const *bar = &fragShader;
+	glShaderSource(vertShaderID, 1, foo, 0);
+	glShaderSource(fragShaderID, 1, bar, 0);
 
+	programID = glCreateProgram();
+
+	glCompileShader(vertShaderID);
+	glCompileShader(fragShaderID);
+
+	glAttachShader(programID, vertShaderID);
+	glAttachShader(programID, fragShaderID);
+
+	glLinkProgram(programID);
+	
+
+	glUseProgram(programID);
+
+}
 
 void init() {
 	GLuint VAOs[1];
@@ -22,11 +68,11 @@ void init() {
 		 +0.00, +1.00, +0.00,
 
 		 +0.85, -0.90 ,	//1
-		 +0.00, +1.00, +0.00,
+		 +1.00, +1.00, +0.00,
 
 
 		 -0.90, +0.85 ,	//2
-		 +0.00, +1.00, +0.00,
+		 +1.00, +0.00, +0.00,
 
 
 		// Triangle 2
@@ -39,7 +85,7 @@ void init() {
 
 
 		 -0.85, +0.90 	//5
-		 + 0.00, +1.00, +0.00,
+		 +0.00, +1.00, +0.00,
 
 	};
 
@@ -86,7 +132,11 @@ int main(int argc, char* argv[]) {
 
 	}
 
+	
+
 	init();
+
+	setupShaders();
 
 	glutDisplayFunc(display);
 
