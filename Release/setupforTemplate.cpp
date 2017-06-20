@@ -5,24 +5,29 @@
 #include <glew\GL\glew.h>
 #include <glut\freeglut.h>
 #include <gl\GL.h>
+#include <glm\glm.hpp>
 
 //extern const char* const vertShader;
 //extern const char* const fragShader;
 
 const char* const vertShader =
 "#version 430\r\n"
-"in layout(location = 0) vec2 position;"
+"in layout(location = 0) vec3 position;"
+"in layout(location = 1) vec3 vertColor;"
+"out vec3 theColor;"
 "void main()"
 "{"
-"gl_Position = vec4(position, 0.0, 1.0);"
+"gl_Position = vec4(position, 1.0);"
+"theColor = vertColor;"
 "}";
 
 const char* const fragShader =
 "#version 430\r\n"
-"out vec4 nicecolor;"
+"in vec3 theColor;"
+"out vec4 daColor;"
 "void main()"
 "{"
-"nicecolor = vec4(1.0, 0.5, 0.0, 1.0);"
+"daColor = vec4(theColor, 1.0);"
 "}";
 
 void setupShaders(){
@@ -35,7 +40,6 @@ void setupShaders(){
 	adapter[0] = vertShader;
 
 
-	
 	const GLchar *const *foo = &vertShader;
 	const GLchar *const *bar = &fragShader;
 	glShaderSource(vertShaderID, 1, foo, 0);
@@ -57,35 +61,37 @@ void setupShaders(){
 }
 
 void init() {
+
+	
 	GLuint VAOs[1];
 
 	glGenVertexArrays(1, VAOs);
 	glBindVertexArray(VAOs[0]);
 	
-	GLfloat verts[12 + 6 * 3] = {
+	GLfloat verts[36] = {
 		//Triangle 1
-		 -0.90, -0.90 ,	//0
+		 -1.00, +1.00, -1.00, 	//0
 		 +0.00, +1.00, +0.00,
 
-		 +0.85, -0.90 ,	//1
-		 +1.00, +1.00, +0.00,
+		 +1.00, +1.00 ,	-1.00,//1
+		 +0.00, +1.00, +0.00,
 
 
-		 -0.90, +0.85 ,	//2
-		 +1.00, +0.00, +0.00,
+		 -0.00, -1.00 ,	-1.00,//2
+		 +0.00, +1.00, +0.00,
 
 
 		// Triangle 2
-		 +0.90, -0.85 ,	//3 
-		 +0.00, +1.00, +0.00,
+		 -1.00, -1.00 ,-0.00,	//3 
+		 +0.00, +0.00, +1.00,
 
 
-		 +0.90, +0.90 ,	//4
-		 +0.00, +1.00, +0.00,
+		 +1.00, -1.00 ,0.00,	//4
+		 +0.00, +0.00, +1.00,
 
 
-		 -0.85, +0.90 	//5
-		 +0.00, +1.00, +0.00,
+		 -0.00, +1.00, 0.00,//5
+		 +0.00, +0.00, +1.00,
 
 	};
 
@@ -96,8 +102,8 @@ void init() {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 5, 0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 5, (char*)(sizeof(GL_FLOAT) * 2));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 6, 0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 6, (char*)(sizeof(GL_FLOAT) * 3));
 	
 
 	GLushort indices[] = { 0, 1, 2, 3, 4, 5 };
@@ -109,9 +115,15 @@ void init() {
 
 }
 
+
+void updateVerts(void){
+
+}
+
 void display(void)
 {
-	glClear(GL_COLOR_BUFFER_BIT);
+	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
 	glFlush();
 }
@@ -124,7 +136,7 @@ int main(int argc, char* argv[]) {
 	glutInitContextVersion(4, 3);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 	glutCreateWindow(argv[0]);
-	
+	glEnable(GL_DEPTH_TEST);
 
 	if (glewInit()) {
 		printf("There was an error initiating glew\n");
@@ -138,6 +150,7 @@ int main(int argc, char* argv[]) {
 
 	setupShaders();
 
+	glutIdleFunc(updateVerts);
 	glutDisplayFunc(display);
 
 	glutMainLoop();
