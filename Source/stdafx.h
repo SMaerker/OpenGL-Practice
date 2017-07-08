@@ -10,6 +10,13 @@
 #include <stdio.h>
 #include <tchar.h>
 
+#include <iostream>
 
-
+#include <glew\GL\glew.h>
+#include <glut\freeglut.h>
+#include <gl\GL.h>
+#include <glm\glm.hpp>
+#include <glm\gtc\matrix_transform.hpp>
+#include <fstream>
+#include <string>
 // TODO: reference additional headers your program requires here
